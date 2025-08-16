@@ -1,0 +1,17 @@
+apiVersion: v1               # Kubernetes API version for Service resources.
+kind: Service                # Resource type: a Service exposes Pods to other Pods or externally.
+metadata:                     # Metadata for the Service object.
+  name: rabbitmq              # Name of the Service.
+  namespace: messaging        # Namespace where the Service will be created.
+spec:                         # Desired state/specification of the Service.
+  clusterIP: None          # StatefulSet requires a headless service, so clusterIP is set to None.
+  selector:                   # Labels used to find the Pods this Service routes to.
+    app: rabbitmq              # Must match the "app" label in the RabbitMQ Deployment's Pod template.
+  ports:                      # List of ports the Service exposes.
+    - name: amqp               # Name for the AMQP port mapping.
+      port: 5672               # Service port (used by clients inside the cluster).
+      targetPort: 5672         # Container port inside the Pod that traffic will be sent to.
+    - name: management         # Name for the management dashboard port mapping.
+      port: 15672              # Service port (used by clients inside the cluster).
+      targetPort: 15672        # Container port inside the Pod for the dashboard.
+  type: ClusterIP              # Service type: only accessible inside the cluster (default).

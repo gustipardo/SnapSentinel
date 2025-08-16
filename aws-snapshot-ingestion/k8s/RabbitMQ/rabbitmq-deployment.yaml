@@ -1,0 +1,26 @@
+apiVersion: apps/v1                   # Kubernetes API version for Deployment resources.
+kind: Deployment                      # Resource type: a Deployment manages replicas and rolling updates.
+metadata:                              # Metadata for the Deployment object.
+  name: rabbitmq                       # Name of the Deployment (used in logs/events).
+  namespace: messaging                 # Namespace where the Deployment will be created.
+spec:                                  # Desired state of the Deployment.
+  replicas: 1                          # Number of RabbitMQ pod replicas to run.
+  selector:                            # How the Deployment identifies the Pods it manages.
+    matchLabels:                       # Must exactly match the labels in the pod template.
+      app: rabbitmq                    # Label key/value to select matching Pods.
+  template:                            # Pod template that the Deployment will create.
+    metadata:                          # Metadata for each Pod.
+      labels:                          # Labels applied to each Pod created.
+        app: rabbitmq                  # Must match the selector above.
+    spec:                              # Pod specification.
+      containers:                      # List of containers in the Pod.
+        - name: rabbitmq               # Name of the container inside the Pod.
+          image: rabbitmq:3-management # Container image: RabbitMQ 3 with management plugin enabled.
+          ports:                        # Ports exposed by the container.
+            - containerPort: 5672       # AMQP port for RabbitMQ clients/apps.
+            - containerPort: 15672      # Web management dashboard port.
+          env:                          # Environment variables for the container.
+            - name: RABBITMQ_DEFAULT_USER # Default admin username.
+              value: "admin"            # Username value.
+            - name: RABBITMQ_DEFAULT_PASS # Default admin password.
+              value: "admin"            # Password value.

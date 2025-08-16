@@ -1,0 +1,21 @@
+*.tfstate
+*.tfstate.backup
+.terraform/
+.env
+
+
+# Binaries and packages
+*.zip
+*.pyc
+__pycache__/
+
+# Terraform files
+*.tfstate
+*.tfstate.backup
+terraform.tfvars   # usualmente contiene secretos o credenciales
+
+# Logs o outputs 
+*.log
+
+# Images
+comiendo_filtered.jpeg
