@@ -3,7 +3,7 @@
 # Define the path to the .env file.
 # Since test.sh is in the 'tests' directory, and .env is in the parent directory,
 # the relative path is '../.env'.
-ENV_FILE="../.env"
+ENV_FILE="./test.env"
 
 # Load variables from the .env file
 # This reads the file and exports its variables to the script's environment.
@@ -15,7 +15,7 @@ else
 fi
 
 # Define the image path, which is local to the parent directory.
-IMAGE_PATH="../comiendo_filtered.jpeg"
+IMAGE_PATH="./comiendo_filtered.jpeg"
 
 echo "Sending snapshot to the endpoint: $API_URL"
 

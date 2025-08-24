@@ -1,8 +1,13 @@
 *.tfstate
-*.tfstate.backup
-.terraform/
-.env
 
+# Terraform state y config en cualquier subcarpeta
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.backup
+**/terraform.tfvars
+
+# Archivos de entorno
+.env
 
 # Binaries and packages
 *.zip
@@ -10,12 +15,33 @@
 __pycache__/
 
 # Terraform files
-*.tfstate
-*.tfstate.backup
-terraform.tfvars   # usualmente contiene secretos o credenciales
 
 # Logs o outputs 
 *.log
 
-# Images
+# Images and file
+# Ignorar imágenes y binarios grandes
+*.jpeg
+*.jpg
+*.png
+*.gif
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.exe
+*.dll
+*.so
+*.dylib
+lambda_function.zip
 comiendo_filtered.jpeg
+
+# Archivos temporales y de backup
+*~
+*.swp
+*.bak
+*.tmp
+
+# Otros archivos de pruebas grandes
+tests/*.jpeg
