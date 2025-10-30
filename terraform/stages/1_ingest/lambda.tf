@@ -7,6 +7,7 @@ resource "aws_lambda_function" "snapshot_ingestor" {
 
   filename      = "lambda_function.zip"
 
+  source_code_hash = filebase64sha256("lambda_function.zip")
   environment {
     variables = {
       BUCKET_NAME = aws_s3_bucket.raw_snapshots.bucket

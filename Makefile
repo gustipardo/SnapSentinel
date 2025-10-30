@@ -2,12 +2,18 @@
 
 .PHONY: test build-lambda
 
-# Ejecuta los tests
 
-test:
-	cd tests && ./test.sh
+# 0_ingest
 
-# Construye el zip de la lambda
+## terraform apply para la etapa 1_ingest
+tf-apply-1_ingest: build-lambda-snapshot_ingestor
+	cd terraform/stages/1_ingest && terraform apply -var-file="terraform.dev.tfvars"
 
-build-lambda:
-	cd lambda && ./build.sh
+## test envia una imagen a la API Gateway, Lambda la sube a S3 raw-snapshots
+test-ingest:
+	cd tests/step1 && ./test.sh
+
+## Construye el zip de la lambda
+
+build-lambda-snapshot_ingestor:
+	cd lambdas/snapshot_ingestor && ./build.sh

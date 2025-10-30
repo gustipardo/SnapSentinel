@@ -37,7 +37,8 @@ __pycache__/
 lambda_function.zip
 comiendo_filtered.jpeg
 
-# Archivos temporales y de backup
+# Node.js dependencies
+node_modules/
 *~
 *.swp
 *.bak
