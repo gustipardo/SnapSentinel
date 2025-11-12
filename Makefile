@@ -9,6 +9,11 @@
 tf-apply-1_ingest: build-lambda-snapshot_ingestor
 	cd terraform/stages/1_ingest && terraform apply -var-file="terraform.dev.tfvars"
 
+## terraform destroy para la etapa 1_ingest
+tf-destroy-1_ingest:
+	cd terraform/stages/1_ingest && terraform destroy -var-file="terraform.dev.tfvars" -auto-approve
+
+
 ## test envia una imagen a la API Gateway, Lambda la sube a S3 raw-snapshots
 test-ingest:
 	cd tests/step1 && ./test.sh
