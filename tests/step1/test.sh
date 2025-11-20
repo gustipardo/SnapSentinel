@@ -15,7 +15,7 @@ else
 fi
 
 # Define the image path, which is local to the parent directory.
-IMAGE_PATH="./comiendo_filtered.jpeg"
+IMAGE_PATH="./image.jpeg"
 
 echo "Sending snapshot to the endpoint: $API_URL"
 

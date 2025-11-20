@@ -5,6 +5,8 @@ resource "aws_s3_bucket" "raw_snapshots" {
     Name = "raw_snapshots"
     Env  = "dev"
   }
+
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_versioning" "raw_snapshots" {
