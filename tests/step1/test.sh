@@ -14,8 +14,20 @@ else
     exit 1
 fi
 
-# Define the image path, which is local to the parent directory.
-IMAGE_PATH="./image.jpeg"
+# Define the image path
+IMAGE_NAME="${1:-image.jpeg}"
+
+if [ -f "./$IMAGE_NAME" ]; then
+    IMAGE_PATH="./$IMAGE_NAME"
+elif [ -f "../images/$IMAGE_NAME" ]; then
+    IMAGE_PATH="../images/$IMAGE_NAME"
+else
+    echo "Error: Image not found: $IMAGE_NAME"
+    echo "Checked ./$IMAGE_NAME and ../images/$IMAGE_NAME"
+    exit 1
+fi
+
+echo "Using image: $IMAGE_PATH"
 
 echo "Sending snapshot to the endpoint: $API_URL"
 

@@ -1,19 +1,21 @@
-import boto3 # AWS SDK
+import boto3
 import json
 import base64
 import uuid
 from datetime import datetime
 import os
 
-# Initialize the S3 client
 s3 = boto3.client("s3")
 BUCKET = os.environ["BUCKET_NAME"]
 
-def lambda_handler(event, context): # event has Api Gateway request data
+def lambda_handler(event, context):
     try:
         body = json.loads(event["body"])
         image_data = base64.b64decode(body["image"])
-        file_name = f"{datetime.utcnow().isoformat()}_{uuid.uuid4()}.jpg"
+        
+        # Generate a safe filename
+        timestamp = int(datetime.utcnow().timestamp())
+        file_name = f"{timestamp}_{uuid.uuid4().hex}.jpg"
         
         s3.put_object(
             Bucket=BUCKET,

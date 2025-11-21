@@ -18,4 +18,7 @@ resource "aws_dynamodb_table" "analysis_results" {
     Name = "analysis_results"
     Env  = "dev"
   }
+
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
 }
