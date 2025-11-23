@@ -44,8 +44,8 @@ def process_record(record):
                 confidence = 0.0
             
             # Rule 1: Person detected with high confidence
-            """ if name == 'Person' and confidence > 90:
-                critical_events.append(f"Person detected (Confidence: {confidence:.2f}%)") """
+            if name == 'Person' and confidence > 90:
+                critical_events.append(f"Person detected (Confidence: {confidence:.2f}%)")
                 
             # Rule 2: Weapon detected
             # List of dangerous objects
