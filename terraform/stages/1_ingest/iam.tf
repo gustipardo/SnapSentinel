@@ -1,6 +1,6 @@
 # Lambda rol
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.lambda_function_name}-role"
+  name = "snap_sentinel_snapshot_ingestor-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -14,7 +14,7 @@ resource "aws_iam_role" "lambda_role" {
 
 # Policy 
 resource "aws_iam_policy" "lambda_policy" {
-  name        = "${var.lambda_function_name}-policy"
+  name        = "snap_sentinel_snapshot_ingestor-policy-${var.environment}"
   description = "Permisos para Lambda acceder a S3 y logs"
 
   policy = jsonencode({

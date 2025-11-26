@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Configuration
-BUCKET_NAME="raw-snapshots-demo20250814"
-TABLE_NAME="analysis_results"
+BUCKET_NAME="snapsentinel-images-dev"
+TABLE_NAME="analysis_results-dev"
 REGION="us-east-1"
 IMAGE_FILE="image.png"
 IMAGE_ID="test-sh-$(date +%s).png"

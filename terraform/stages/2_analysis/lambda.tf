@@ -7,7 +7,7 @@ data "archive_file" "analyzer_zip" {
 
 resource "aws_lambda_function" "analyzer" {
   filename         = data.archive_file.analyzer_zip.output_path
-  function_name    = "snap_sentinel_analyzer"
+  function_name    = "snap_sentinel_analyzer-${var.environment}"
   role             = aws_iam_role.analyzer_lambda_role.arn
   handler          = "analyzer.lambda_handler"
   source_code_hash = data.archive_file.analyzer_zip.output_base64sha256
@@ -16,7 +16,8 @@ resource "aws_lambda_function" "analyzer" {
 
   environment {
     variables = {
-      LOG_LEVEL = "INFO"
+      LOG_LEVEL           = "INFO"
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.analysis_results.name
     }
   }
 }

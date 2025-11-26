@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "analysis_results" {
-  name         = "analysis_results"
+  name         = "analysis_results-${var.environment}"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "image_id"
   range_key    = "timestamp"
@@ -16,7 +16,7 @@ resource "aws_dynamodb_table" "analysis_results" {
 
   tags = {
     Name = "analysis_results"
-    Env  = "dev"
+    Env  = var.environment
   }
 
   stream_enabled   = true

@@ -2,6 +2,7 @@ import json
 import logging
 import boto3
 import datetime
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -9,7 +10,7 @@ logger.setLevel(logging.INFO)
 rekognition = boto3.client('rekognition')
 s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('analysis_results')
+table = dynamodb.Table(os.environ['DYNAMODB_TABLE_NAME'])
 
 def lambda_handler(event, context):
     """

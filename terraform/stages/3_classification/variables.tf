@@ -9,3 +9,8 @@ variable "email_address" {
   type        = string
   default     = "sandbox17201@gmail.com"
 }
+
+variable "environment" {
+  description = "Deployment environment (dev or prod)"
+  type        = string
+}

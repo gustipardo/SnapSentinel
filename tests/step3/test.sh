@@ -3,7 +3,7 @@
 # Load environment variables if needed
 # source ../step1/test.env
 
-TABLE_NAME="analysis_results"
+TABLE_NAME="analysis_results-dev"
 TIMESTAMP=$(date +%s)
 
 echo "Inserting SAFE record (No Alert expected)..."

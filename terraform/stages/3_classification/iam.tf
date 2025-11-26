@@ -1,5 +1,5 @@
 resource "aws_iam_role" "event_classifier_role" {
-  name = "event_classifier_role"
+  name = "event_classifier_role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "event_classifier_role" {
 }
 
 resource "aws_iam_role_policy" "event_classifier_policy" {
-  name = "event_classifier_policy"
+  name = "event_classifier_policy-${var.environment}"
   role = aws_iam_role.event_classifier_role.id
 
   policy = jsonencode({

@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "event_classifier" {
   filename      = "./event_classifier.zip"
-  function_name = "EventClassifier"
+  function_name = "event_classifier-${var.environment}"
   role          = aws_iam_role.event_classifier_role.arn
   handler       = "event_classifier.lambda_handler"
   runtime       = "python3.9"

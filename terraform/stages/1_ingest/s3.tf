@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "raw_snapshots" {
-  bucket = var.bucket_name
+  bucket = "snapsentinel-images-${var.environment}"
 
   tags = {
     Name = "raw_snapshots"
-    Env  = "dev"
+    Env  = var.environment
   }
 
   force_destroy = true

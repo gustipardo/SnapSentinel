@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "critical_events" {
-  name = "critical-events-topic"
+  name = "critical-events-topic-${var.environment}"
 }
 
 resource "aws_sns_topic_subscription" "email_target" {
