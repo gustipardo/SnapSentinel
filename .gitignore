@@ -9,6 +9,18 @@
 # Archivos de entorno
 .env
 
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Pytest and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
 # Binaries and packages
 *.zip
 *.pyc
