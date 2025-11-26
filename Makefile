@@ -93,3 +93,23 @@ tf-apply-all: tf-apply-1_ingest tf-apply-2_analysis tf-apply-3_classification
 ########################################
 
 tf-destroy-all: tf-destroy-3_classification tf-destroy-2_analysis tf-destroy-1_ingest
+
+########################################
+# Standardized Commands
+########################################
+
+## Ejecuta tests unitarios
+test-unit:
+	pytest tests/unit/
+
+## Ejecuta tests de integración
+test-integration:
+	pytest tests/integration/
+
+## Despliega todo a dev
+deploy-dev:
+	$(MAKE) tf-apply-all ENV=dev
+
+## Ejecuta tests E2E
+test-e2e:
+	pytest tests/e2e/

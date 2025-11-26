@@ -127,3 +127,45 @@ Solución: No activaste el entorno virtual o olvidaste hacer pip install. Revisa
 Tests fallan en Integration:
 
 Solución: Asegúrate de que has desplegado la infraestructura a dev (terraform apply) antes de correr estos tests, ya que buscan recursos reales existentes.
+
+🚀 5. Ejecutar End-to-End (E2E) Tests (Flujo Completo)
+
+Estos tests verifican el flujo completo del sistema desde el inicio hasta el final, simulando un escenario real de uso.
+
+⚠️ Importante: Requiere credenciales activas de AWS y la infraestructura desplegada en dev.
+
+Comando estándar:
+
+```bash
+pytest tests/e2e
+```
+
+¿Qué se está probando?
+
+El test E2E (`test_full_flow.py`) ejecuta el pipeline completo:
+
+1. **Input**: Envía una imagen "crítica" (ej: persona encapuchada) al API Gateway.
+2. **Procesamiento**: Espera a que el sistema complete todo el flujo:
+   - API Gateway → S3
+   - S3 → Lambda Analyzer → Rekognition → DynamoDB
+   - DynamoDB Stream → Lambda Classifier → SNS
+3. **Verificación**: Confirma que aparece el log "Publishing to SNS" en CloudWatch Logs.
+
+Resultado esperado:
+
+```
+tests/e2e/test_full_flow.py .                    [100%]
+
+================ 1 passed in 16.68s ================
+```
+
+📝 6. Comandos Makefile (Atajos)
+
+Para facilitar la ejecución, puedes usar estos comandos desde la raíz del proyecto:
+
+```bash
+make test-unit           # Ejecuta tests unitarios
+make test-integration    # Ejecuta tests de integración
+make test-e2e           # Ejecuta tests E2E
+make deploy-dev         # Despliega toda la infraestructura a dev
+```
