@@ -11,7 +11,7 @@ def test_s3_trigger_analysis(s3_client, dynamodb_client, bucket_name, table_name
     2. Poll DynamoDB for analysis result.
     """
     image_id = f"test-stage2-{int(time.time())}.jpg"
-    image_path = os.path.join(os.path.dirname(__file__), "../step2/image.png")
+    image_path = os.path.join(os.path.dirname(__file__), "../assets/image.png")
     
     if not os.path.exists(image_path):
         pytest.fail(f"Test image not found at {image_path}")

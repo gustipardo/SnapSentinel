@@ -15,7 +15,7 @@ def test_api_gateway_upload(api_url, s3_client, bucket_name, dynamodb_client, ta
     so we need to clean up the DynamoDB record as well.
     """
     # Use an existing test image
-    image_path = os.path.join(os.path.dirname(__file__), "../step1/image.jpeg")
+    image_path = os.path.join(os.path.dirname(__file__), "../assets/image.jpeg")
     
     # If image doesn't exist (e.g. running from different cwd), try to find it or skip
     if not os.path.exists(image_path):

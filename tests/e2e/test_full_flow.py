@@ -18,12 +18,12 @@ def test_e2e_critical_flow(api_url, s3_client, bucket_name, dynamodb_client, tab
     # However, for the purpose of this test, we assume the image provided IS critical.
     
     image_filename = "encapuchado_espalda.png"
-    image_path = os.path.join(os.path.dirname(__file__), f"../images/{image_filename}")
+    image_path = os.path.join(os.path.dirname(__file__), f"../assets/{image_filename}")
     
     if not os.path.exists(image_path):
         # Fallback to step1 image if specific one not found, though it might not trigger the alert
         # This is a risk. Let's try to find any image.
-        image_path = os.path.join(os.path.dirname(__file__), "../step1/image.jpeg")
+        image_path = os.path.join(os.path.dirname(__file__), "../assets/image.jpeg")
         if not os.path.exists(image_path):
              pytest.fail("No test image found.")
         print(f"Warning: Using fallback image {image_path}. This might not trigger the critical alert if Rekognition doesn't see a threat.")
