@@ -1,0 +1,99 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  infra-check:
+    name: Infrastructure Check
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Check - Stage 1 (Ingest)
+        run: |
+          cd terraform/stages/1_ingest
+          terraform fmt -check
+          terraform init -reconfigure -backend-config="key=env/dev/ingest/terraform.tfstate"
+          terraform validate
+          terraform plan -var-file="dev.tfvars"
+
+      - name: Terraform Check - Stage 2 (Analysis)
+        run: |
+          cd terraform/stages/2_analysis
+          terraform fmt -check
+          terraform init -reconfigure -backend-config="key=env/dev/analysis/terraform.tfstate"
+          terraform validate
+          terraform plan -var-file="dev.tfvars"
+
+      - name: Terraform Check - Stage 3 (Classification)
+        run: |
+          cd terraform/stages/3_classification
+          terraform fmt -check
+          terraform init -reconfigure -backend-config="key=env/dev/classification/terraform.tfstate"
+          terraform validate
+          terraform plan -var-file="dev.tfvars"
+
+  code-check:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black
+          if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
+
+      - name: Lint with Flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Check Formatting with Black
+        run: black --check .
+
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
+
+      - name: Run Unit Tests
+        run: make test-unit
