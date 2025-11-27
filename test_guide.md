@@ -72,15 +72,26 @@ Estos tests sí conectan a AWS. Prueban que el flujo funcione realmente en la nu
 
 ⚠️ Importante: Requiere credenciales activas de AWS.
 
-Comando estándar:
+**Comportamiento de Limpieza:**
 
+Por defecto, los tests de integración **limpian automáticamente** todos los recursos creados durante la prueba (archivos en S3 y registros en DynamoDB). Esto mantiene tu entorno limpio y evita acumulación de datos de prueba.
+
+**Comando estándar (con limpieza automática):**
+
+```bash
 pytest tests/integration
+```
 
+**Comando para conservar recursos (útil para depuración):**
 
-Comando para depuración (No borrar recursos):
-Si quieres ver los archivos en S3 o los datos en DynamoDB después del test (para inspeccionar errores), usa:
+Si quieres inspeccionar los archivos en S3 o los datos en DynamoDB después del test (por ejemplo, para depurar errores), usa:
 
+```bash
 pytest tests/integration --keep-resources
+```
+
+Con esta opción, los recursos NO se eliminarán y podrás revisarlos manualmente en la consola de AWS.
+
 
 
 ¿Qué se está probando?
@@ -134,11 +145,25 @@ Estos tests verifican el flujo completo del sistema desde el inicio hasta el fin
 
 ⚠️ Importante: Requiere credenciales activas de AWS y la infraestructura desplegada en dev.
 
-Comando estándar:
+**Comportamiento de Limpieza:**
+
+Por defecto, los tests E2E **limpian automáticamente** todos los recursos creados durante la prueba (archivos en S3 y registros en DynamoDB). Esto mantiene tu entorno limpio después de cada ejecución.
+
+**Comando estándar (con limpieza automática):**
 
 ```bash
 pytest tests/e2e
 ```
+
+**Comando para conservar recursos (útil para depuración):**
+
+Si quieres inspeccionar los recursos creados después del test (por ejemplo, para verificar el contenido en S3 o DynamoDB), usa:
+
+```bash
+pytest tests/e2e --keep-resources
+```
+
+Con esta opción, los recursos NO se eliminarán y podrás revisarlos manualmente en la consola de AWS.
 
 ¿Qué se está probando?
 
@@ -150,6 +175,7 @@ El test E2E (`test_full_flow.py`) ejecuta el pipeline completo:
    - S3 → Lambda Analyzer → Rekognition → DynamoDB
    - DynamoDB Stream → Lambda Classifier → SNS
 3. **Verificación**: Confirma que aparece el log "Publishing to SNS" en CloudWatch Logs.
+4. **Limpieza**: Elimina automáticamente los recursos creados (a menos que uses `--keep-resources`).
 
 Resultado esperado:
 
@@ -164,6 +190,7 @@ tests/e2e/test_full_flow.py .                    [100%]
 Para facilitar la ejecución, puedes usar estos comandos desde la raíz del proyecto:
 
 ```bash
+source .venv/bin/activate
 make test-unit           # Ejecuta tests unitarios
 make test-integration    # Ejecuta tests de integración
 make test-e2e           # Ejecuta tests E2E

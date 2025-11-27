@@ -5,11 +5,12 @@ import time
 import os
 import base64
 
-def test_e2e_critical_flow(api_url, logs_client, log_group_name):
+def test_e2e_critical_flow(api_url, s3_client, bucket_name, dynamodb_client, table_name, logs_client, log_group_name, keep_resources):
     """
     E2E Test:
     1. Send a known 'Critical' image to API Gateway.
     2. Poll CloudWatch Logs for the 'Publishing to SNS' message.
+    3. Cleanup resources (S3 object and DynamoDB record) unless --keep-resources is set.
     """
     # Use a known critical image (e.g. one that Rekognition will classify as Person/Hoodie/Weapon)
     # For this test, we'll use 'encapuchado_espalda.png' if available, or fallback to a generic one
@@ -93,3 +94,45 @@ def test_e2e_critical_flow(api_url, logs_client, log_group_name):
         time.sleep(3)
         
     assert found_log, f"E2E Failed: Did not find SNS publication log for {file_key} in {log_group_name}. Pipeline might have failed or image was not deemed critical."
+
+    # 3. Cleanup resources
+    if not keep_resources:
+        print("Cleaning up test resources...")
+        
+        # Delete S3 object
+        try:
+            print(f"Deleting S3 object: {file_key} from bucket {bucket_name}")
+            s3_client.delete_object(Bucket=bucket_name, Key=file_key)
+            print("S3 object deleted successfully")
+        except Exception as e:
+            print(f"Warning: Failed to delete S3 object: {e}")
+        
+        # Delete DynamoDB record
+        try:
+            print(f"Deleting DynamoDB record for image_id: {file_key}")
+            # First, query to get the timestamp (sort key)
+            response = dynamodb_client.query(
+                TableName=table_name,
+                KeyConditionExpression="image_id = :id",
+                ExpressionAttributeValues={":id": {"S": file_key}}
+            )
+            
+            if response["Count"] > 0:
+                items = response['Items']
+                for item in items:
+                    timestamp = item['timestamp']['S']
+                    dynamodb_client.delete_item(
+                        TableName=table_name,
+                        Key={
+                            "image_id": {"S": file_key},
+                            "timestamp": {"S": timestamp}
+                        }
+                    )
+                    print(f"DynamoDB record deleted successfully (timestamp: {timestamp})")
+            else:
+                print(f"Warning: No DynamoDB record found for image_id: {file_key}")
+        except Exception as e:
+            print(f"Warning: Failed to delete DynamoDB record: {e}")
+    else:
+        print("Skipping cleanup (--keep-resources set)")
+

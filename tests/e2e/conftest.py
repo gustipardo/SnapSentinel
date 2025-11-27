@@ -7,6 +7,15 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--keep-resources", action="store_true", default=False, help="Do not delete resources created during tests"
+    )
+
+@pytest.fixture(scope="session")
+def keep_resources(request):
+    return request.config.getoption("--keep-resources")
+
 @pytest.fixture(scope="session")
 def env():
     return os.environ.get("ENV", "dev")
@@ -20,6 +29,10 @@ def s3_client(region):
     return boto3.client("s3", region_name=region)
 
 @pytest.fixture(scope="session")
+def dynamodb_client(region):
+    return boto3.client("dynamodb", region_name=region)
+
+@pytest.fixture(scope="session")
 def logs_client(region):
     return boto3.client("logs", region_name=region)
 
@@ -30,6 +43,10 @@ def apigateway_client(region):
 @pytest.fixture(scope="session")
 def bucket_name(env):
     return f"snapsentinel-images-{env}"
+
+@pytest.fixture(scope="session")
+def table_name(env):
+    return f"analysis_results-{env}"
 
 @pytest.fixture(scope="session")
 def api_url(apigateway_client, env, region):
