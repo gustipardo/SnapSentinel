@@ -4,7 +4,10 @@ import boto3
 from decimal import Decimal
 
 sns_client = boto3.client('sns')
+dynamodb = boto3.resource('dynamodb')
 SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']
+TABLE_NAME = os.environ['DYNAMODB_TABLE']
+table = dynamodb.Table(TABLE_NAME)
 
 def lambda_handler(event, context):
     print(f"Received event: {json.dumps(event)}")
@@ -64,6 +67,7 @@ def process_record(record):
                 
         if critical_events:
             publish_alert(image_key, timestamp, critical_events)
+            update_status(image_key, timestamp)
             
     except Exception as e:
         print(f"Error processing record: {e}")
@@ -80,3 +84,26 @@ def publish_alert(image_key, timestamp, events):
         Message=message,
         Subject=subject
     )
+
+def update_status(image_key, timestamp):
+    try:
+        print(f"Updating status to ALERT for {image_key} in {TABLE_NAME}")
+        table.update_item(
+            Key={
+                'image_id': image_key,
+                'timestamp': timestamp
+            },
+            UpdateExpression="set #s = :s",
+            ExpressionAttributeNames={
+                '#s': 'status'
+            },
+            ExpressionAttributeValues={
+                ':s': 'ALERT'
+            }
+        )
+        print(f"Successfully updated status for {image_key}")
+    except Exception as e:
+        print(f"Error updating DynamoDB status: {e}")
+        # We don't raise here to avoid re-processing if SNS already sent, 
+        # but ideally operations should be idempotent.
+

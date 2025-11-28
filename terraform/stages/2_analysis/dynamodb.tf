@@ -14,6 +14,18 @@ resource "aws_dynamodb_table" "analysis_results" {
     type = "S"
   }
 
+  attribute {
+    name = "status"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "AlertsByIndex"
+    hash_key        = "status"
+    range_key       = "timestamp"
+    projection_type = "ALL"
+  }
+
   tags = {
     Name = "analysis_results"
     Env  = var.environment

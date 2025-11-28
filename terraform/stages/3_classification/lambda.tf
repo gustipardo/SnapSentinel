@@ -10,7 +10,8 @@ resource "aws_lambda_function" "event_classifier" {
 
   environment {
     variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.critical_events.arn
+      SNS_TOPIC_ARN  = aws_sns_topic.critical_events.arn
+      DYNAMODB_TABLE = data.aws_dynamodb_table.analysis_results.name
     }
   }
 }

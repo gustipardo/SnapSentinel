@@ -82,17 +82,40 @@ tf-destroy-3_classification:
 test-classification:
 	cd tests/step3 && ./test.sh
 
+# Stage 4: API
+########################################
+
+## Construye la lambda api_handler
+build-lambda-api_handler:
+	cd lambdas/api_handler && ./build.sh
+
+## terraform apply para la etapa 4_api
+tf-apply-4_api: build-lambda-api_handler
+	cd terraform/stages/4_api && \
+	terraform init -reconfigure -backend-config="key=env/$(ENV)/api/terraform.tfstate" && \
+	terraform apply -var-file="$(ENV).tfvars" -auto-approve
+
+## terraform destroy para la etapa 4_api
+tf-destroy-4_api:
+	cd terraform/stages/4_api && \
+	terraform init -reconfigure -backend-config="key=env/$(ENV)/api/terraform.tfstate" && \
+	terraform destroy -var-file="$(ENV).tfvars" -auto-approve
+
+## test api endpoint
+test-api:
+	pytest tests/integration/test_stage_4_app_api.py
+
 ########################################
 # Apply all stages
 ########################################
 
-tf-apply-all: tf-apply-1_ingest tf-apply-2_analysis tf-apply-3_classification
+tf-apply-all: tf-apply-1_ingest tf-apply-2_analysis tf-apply-3_classification tf-apply-4_api
 
 ########################################
 # Destroy all stages (reverse order)
 ########################################
 
-tf-destroy-all: tf-destroy-3_classification tf-destroy-2_analysis tf-destroy-1_ingest
+tf-destroy-all: tf-destroy-4_api tf-destroy-3_classification tf-destroy-2_analysis tf-destroy-1_ingest
 
 ########################################
 # Standardized Commands

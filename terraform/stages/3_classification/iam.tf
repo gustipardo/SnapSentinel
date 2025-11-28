@@ -44,6 +44,13 @@ resource "aws_iam_role_policy" "event_classifier_policy" {
       {
         Effect = "Allow"
         Action = [
+          "dynamodb:UpdateItem"
+        ]
+        Resource = data.aws_dynamodb_table.analysis_results.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "sns:Publish"
         ]
         Resource = aws_sns_topic.critical_events.arn
