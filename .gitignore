@@ -49,6 +49,12 @@ __pycache__/
 lambda_function.zip
 comiendo_filtered.jpeg
 
+# Allow images in assets
+!**/assets/*.jpeg
+!**/assets/*.jpg
+!**/assets/*.png
+!**/assets/*.gif
+
 # Node.js dependencies
 node_modules/
 *~
