@@ -28,7 +28,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.12"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -67,7 +67,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.12"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
