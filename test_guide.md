@@ -195,4 +195,13 @@ make test-unit           # Ejecuta tests unitarios
 make test-integration    # Ejecuta tests de integración
 make test-e2e           # Ejecuta tests E2E
 make deploy-dev         # Despliega toda la infraestructura a dev
+
+**Pasar argumentos a los tests (ej. --keep-resources):**
+
+Puedes usar la variable `ARGS` para pasar banderas adicionales a pytest a través de make:
+
+```bash
+make test-integration ARGS="--keep-resources"
+make test-e2e ARGS="-v -s"
+```
 ```
