@@ -10,7 +10,8 @@ resource "aws_lambda_function" "api_handler" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = data.aws_dynamodb_table.analysis_results.name
+      DYNAMODB_TABLE     = data.aws_dynamodb_table.analysis_results.name
+      IMAGES_BUCKET_NAME = data.aws_s3_bucket.images.id
     }
   }
 }

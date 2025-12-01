@@ -11,11 +11,16 @@ os.environ["AWS_SECURITY_TOKEN"] = "testing"
 os.environ["AWS_SESSION_TOKEN"] = "testing"
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 os.environ["DYNAMODB_TABLE"] = "analysis_results-test"
+os.environ["IMAGES_BUCKET_NAME"] = "test-images-bucket"
 
 from lambdas.api_handler import api_handler
 
 @mock_aws
 def test_api_handler_success():
+    # Setup S3
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="test-images-bucket")
+    
     # Setup DynamoDB
     dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
     table = dynamodb.create_table(
@@ -58,9 +63,15 @@ def test_api_handler_success():
     body = json.loads(response["body"])
     assert len(body["items"]) == 1
     assert body["items"][0]["id"] == "img1"
+    assert "image_url" in body["items"][0]
+    assert "https://test-images-bucket.s3.amazonaws.com/img1" in body["items"][0]["image_url"]
 
 @mock_aws
 def test_api_handler_pagination():
+    # Setup S3
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="test-images-bucket")
+
     # Setup DynamoDB
     dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
     table = dynamodb.create_table(
@@ -97,12 +108,14 @@ def test_api_handler_pagination():
     assert response["statusCode"] == 200
     body = json.loads(response["body"])
     assert len(body["items"]) == 2
-    assert "next_page_token" in body
+    assert "next_token" in body
+    assert "image_url" in body["items"][0]
     
-    # Call Lambda with next_page_token
-    event = {"queryStringParameters": {"limit": "2", "next_page_token": body["next_page_token"]}}
+    # Call Lambda with next_token
+    event = {"queryStringParameters": {"limit": "2", "next_token": body["next_token"]}}
     response = api_handler.lambda_handler(event, None)
     
     assert response["statusCode"] == 200
     body = json.loads(response["body"])
     assert len(body["items"]) == 1
+    assert "image_url" in body["items"][0]

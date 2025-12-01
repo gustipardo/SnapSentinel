@@ -5,8 +5,24 @@ import base64
 from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource('dynamodb')
+s3_client = boto3.client('s3')
 TABLE_NAME = os.environ['DYNAMODB_TABLE']
+IMAGES_BUCKET_NAME = os.environ.get('IMAGES_BUCKET_NAME')
 table = dynamodb.Table(TABLE_NAME)
+
+def generate_signed_url(image_key):
+    if not IMAGES_BUCKET_NAME:
+        return None
+    try:
+        url = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': IMAGES_BUCKET_NAME, 'Key': image_key},
+            ExpiresIn=3600  # 1 hour
+        )
+        return url
+    except Exception as e:
+        print(f"Error generating signed URL for {image_key}: {e}")
+        return None
 
 def lambda_handler(event, context):
     print(f"Received event: {json.dumps(event)}")
@@ -14,7 +30,7 @@ def lambda_handler(event, context):
     try:
         query_params = event.get('queryStringParameters', {}) or {}
         limit = int(query_params.get('limit', 20))
-        next_token = query_params.get('next_page_token')
+        next_token = query_params.get('next_token')
         
         query_kwargs = {
             'IndexName': 'AlertsByIndex',
@@ -31,7 +47,7 @@ def lambda_handler(event, context):
                 print(f"Invalid next_token: {e}")
                 return {
                     'statusCode': 400,
-                    'body': json.dumps({'error': 'Invalid next_page_token'})
+                    'body': json.dumps({'error': 'Invalid next_token'})
                 }
         
         response = table.query(**query_kwargs)
@@ -42,12 +58,16 @@ def lambda_handler(event, context):
         # Format items
         formatted_items = []
         for item in items:
-            formatted_items.append({
-                'id': item.get('image_id'),
+            image_id = item.get('image_id')
+            formatted_item = {
+                'id': image_id,
                 'timestamp': item.get('timestamp'),
                 'labels': item.get('labels'),
                 'status': item.get('status')
-            })
+            }
+            if image_id:
+                formatted_item['image_url'] = generate_signed_url(image_id)
+            formatted_items.append(formatted_item)
             
         response_body = {
             'items': formatted_items
@@ -55,7 +75,7 @@ def lambda_handler(event, context):
         
         if last_evaluated_key:
             encoded_key = base64.b64encode(json.dumps(last_evaluated_key).encode('utf-8')).decode('utf-8')
-            response_body['next_page_token'] = encoded_key
+            response_body['next_token'] = encoded_key
             
         return {
             'statusCode': 200,

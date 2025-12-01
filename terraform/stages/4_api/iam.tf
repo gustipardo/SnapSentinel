@@ -41,6 +41,15 @@ resource "aws_iam_role_policy" "api_handler_policy" {
           data.aws_dynamodb_table.analysis_results.arn,
           "${data.aws_dynamodb_table.analysis_results.arn}/index/AlertsByIndex"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject"
+        ]
+        Resource = [
+          "${data.aws_s3_bucket.images.arn}/*"
+        ]
       }
     ]
   })
