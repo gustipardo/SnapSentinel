@@ -103,7 +103,7 @@ tf-destroy-4_api:
 
 ## test api endpoint
 test-api:
-	pytest tests/integration/test_stage_4_app_api.py
+	pytest tests/integration/test_stage_4_app_api.py $(ARGS)
 
 ########################################
 # Apply all stages
@@ -123,11 +123,11 @@ tf-destroy-all: tf-destroy-4_api tf-destroy-3_classification tf-destroy-2_analys
 
 ## Ejecuta tests unitarios
 test-unit:
-	pytest tests/unit/
+	pytest tests/unit/ $(ARGS)
 
 ## Ejecuta tests de integración
 test-integration:
-	pytest tests/integration/
+	pytest tests/integration/ $(ARGS)
 
 ## Despliega todo a dev
 deploy-dev:
@@ -135,4 +135,4 @@ deploy-dev:
 
 ## Ejecuta tests E2E
 test-e2e:
-	pytest tests/e2e/
+	pytest tests/e2e/ $(ARGS)
