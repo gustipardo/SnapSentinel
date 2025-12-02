@@ -58,3 +58,40 @@ resource "aws_iam_role_policy" "event_classifier_policy" {
     ]
   })
 }
+
+resource "aws_iam_role" "notification_sender_role" {
+  name = "notification_sender_role-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "notification_sender_policy" {
+  name = "notification_sender_policy-${var.environment}"
+  role = aws_iam_role.notification_sender_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}

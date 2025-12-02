@@ -22,6 +22,9 @@ build-lambda-analyzer:
 build-lambda-event_classifier:
 	cd lambdas/event_classifier && ./build.sh
 
+build-lambda-notification_sender:
+	cd lambdas/notification_sender && ./build.sh
+
 ########################################
 # Stage 1: Ingest
 ########################################
@@ -67,7 +70,7 @@ test-analysis:
 ########################################
 
 ## terraform apply para la etapa 3_classification
-tf-apply-3_classification: build-lambda-event_classifier
+tf-apply-3_classification: build-lambda-event_classifier build-lambda-notification_sender
 	cd terraform/stages/3_classification && \
 	terraform init -reconfigure -backend-config="key=env/$(ENV)/classification/terraform.tfstate" && \
 	terraform apply -var-file="$(ENV).tfvars" -auto-approve

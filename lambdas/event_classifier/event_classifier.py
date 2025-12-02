@@ -74,15 +74,24 @@ def process_record(record):
         raise e
 
 def publish_alert(image_key, timestamp, events):
-    message = f"CRITICAL ALERT!\n\nImage: {image_key}\nTime: {timestamp}\n\nEvents detected:\n" + "\n".join(events)
-    subject = f"SnapSentinel Alert: Critical Event Detected in {image_key}"
+    # Construct the payload for the notification sender
+    # events is a list of strings like "Person detected (Confidence: 99.5%)"
+    # We'll join them for the label field or pick the first one
+    label_text = ", ".join(events)
     
-    print(f"Publishing to SNS: {subject}")
+    alert_payload = {
+        "type": "SECURITY_ALERT",
+        "image_id": image_key,
+        "timestamp": timestamp,
+        "label": label_text,
+        "confidence": "HIGH" # We could parse this from events if needed, but HIGH is safe for critical alerts
+    }
+    
+    print(f"Publishing to SNS: {json.dumps(alert_payload)}")
     
     sns_client.publish(
         TopicArn=SNS_TOPIC_ARN,
-        Message=message,
-        Subject=subject
+        Message=json.dumps(alert_payload)
     )
 
 def update_status(image_key, timestamp):
