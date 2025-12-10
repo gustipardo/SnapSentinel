@@ -41,6 +41,13 @@ flowchart LR
     I -->|No| K[Log & Ignore]
     J -->|Email/SMS| L[Security Team]
     end
+
+    subgraph Stage 4: Retrieval API
+    M[Client App] -->|GET /alerts| N[API Gateway]
+    N -->|Trigger| O[API Handler Lambda]
+    O -->|Query| G
+    O -->|Generate URL| D
+    end
 ```
 
 ### Pipeline Stages
@@ -56,6 +63,9 @@ flowchart LR
     *   New DynamoDB records trigger the **Event Classifier**.
     *   Business rules are applied (e.g., *IF Label='Gun' AND Confidence > 90%*).
     *   **Amazon SNS** publishes alerts to subscribed endpoints (Email/SMS) for critical findings.
+4.  **Retrieval API**:
+    *   REST API to fetch alerts and analysis results.
+    *   Generates **Presigned URLs** for secure, temporary access to the raw images in S3.
 
 ---
 
@@ -65,19 +75,23 @@ The project follows a modular structure, separating infrastructure code from app
 
 ```text
 .
+├── .github/
+│   └── workflows/            # CI/CD pipelines (ci.yml, cd.yml)
 ├── lambdas/                  # Source code for Lambda functions
 │   ├── snapshot_ingestor/    # Stage 1: Handles image upload to S3
 │   ├── analyzer/             # Stage 2: Rekognition integration
-│   └── event_classifier/     # Stage 3: Business logic & alerting
+│   ├── event_classifier/     # Stage 3: Business logic & alerting
+│   └── api_handler/          # Stage 4: API for retrieving alerts
 ├── terraform/                # Infrastructure as Code (IaC)
 │   └── stages/
 │       ├── 1_ingest/         # API Gateway, S3, Ingestor Lambda
 │       ├── 2_analysis/       # Analyzer Lambda, DynamoDB, IAM roles
-│       └── 3_classification/ # Classifier Lambda, SNS Topic
+│       ├── 3_classification/ # Classifier Lambda, SNS Topic
+│       └── 4_api/            # API Gateway, Handler Lambda
 ├── tests/                    # End-to-end and integration tests
-│   ├── step1/                # Ingestion verification
-│   ├── step2/                # Analysis & DB verification
-│   └── step3/                # Alerting verification
+│   ├── unit/                 # Local unit tests
+│   ├── integration/          # Tests against AWS dev environment
+│   └── e2e/                  # Full pipeline tests
 └── Makefile                  # Automation for build, deploy, and test
 ```
 
@@ -119,35 +133,49 @@ make tf-apply-2_analysis
 make tf-apply-3_classification
 ```
 
+**Stage 4: API**
+```bash
+make tf-apply-4_api
+```
+
 > **Note**: Ensure previous stages are deployed before advancing, as later stages depend on resources (like S3 buckets or DynamoDB tables) created earlier.
 
 ---
 
 ## 🕹️ Usage & Testing
 
-The project includes a comprehensive `Makefile` to run automated tests for each stage.
+The project includes a comprehensive testing suite documented in `test_guide.md`.
 
-### 1. Test Ingestion
-Simulates a camera upload. Checks if the image lands in S3.
+### 1. Unit Tests (Local)
+Tests Lambda logic in isolation using `moto`.
 ```bash
-make test-ingest
+make test-unit
 ```
 
-### 2. Test Analysis
-Uploads a sample image and queries DynamoDB to verify Rekognition labels are saved.
+### 2. Integration Tests (AWS Dev)
+Verifies each stage against the deployed development environment.
 ```bash
-make test-analysis
+make test-integration
 ```
 
-### 3. Test Classification
-Triggers the full pipeline and verifies that critical events result in an SNS alert (check your subscribed email).
+### 3. End-to-End Tests
+Uploads an image and verifies the full pipeline latency and alerting.
 ```bash
-make test-classification
+make test-e2e
 ```
 
 ### Utility Commands
 *   **Build Lambdas**: `make build-lambda-analyzer` (or others)
 *   **Destroy Infrastructure**: `make tf-destroy-all` (Safely tears down all resources in reverse order)
+
+---
+
+## 🔄 CI/CD Pipelines
+
+Automated pipelines via GitHub Actions:
+
+*   **CI (`ci.yml`)**: Runs on Pull Requests. Executes linting and unit tests.
+*   **CD (`cd.yml`)**: Runs on push to `main`. Deploys infrastructure to `dev`, runs integration tests, and promotes to `prod` (manual approval).
 
 ---
 
