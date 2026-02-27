@@ -25,7 +25,7 @@ Built entirely on AWS serverless architecture, SnapSentinel scales to zero when 
 
 ## Demo
 
-![Demo](/Demo.gif)
+![Demo](/demo.gif)
 
 ## 🏗️ Architecture
 
