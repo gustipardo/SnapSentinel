@@ -23,6 +23,10 @@ Built entirely on AWS serverless architecture, SnapSentinel scales to zero when 
 
 ---
 
+## Demo
+
+![Demo](/Demo.gif)
+
 ## 🏗️ Architecture
 
 SnapSentinel employs an event-driven architecture orchestrated by AWS Lambda and Amazon S3. The pipeline is divided into three distinct stages:
