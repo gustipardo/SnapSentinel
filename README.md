@@ -1,5 +1,12 @@
 # SnapSentinel
 
+SnapSentinel was developed as part of an MVP for an AI-powered autonomous security platform.
+The goal was to validate whether real-time image analysis could reliably detect intrusions,
+weapons, and suspicious activity using existing security cameras.
+
+This MVP successfully validated the concept and was later evolved into a production system
+now deployed across commercial, industrial, and retail sites worldwide.
+
 **Serverless Security Snapshot Analysis Pipeline**
 
 SnapSentinel is a robust, serverless data pipeline designed to ingest, analyze, and classify security camera screenshots in real-time. By leveraging the power of AWS cloud-native services, it automates the detection of critical events—such as the presence of weapons or unauthorized persons—transforming raw image data into actionable security alerts.
